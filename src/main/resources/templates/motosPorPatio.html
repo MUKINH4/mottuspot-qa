@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Motos do Pátio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            plugins: [daisyui],
+            daisyui: { themes: ["light", "dark"] },
+        }
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.57.0/dist/full.css" rel="stylesheet">
+
+</head>
+<body class="bg-gray-100 min-h-screen">
+<div th:replace="~{partials/header :: header(${patio})}"></div>
+
+<div class="max-w-5xl mx-auto">
+
+    <!-- Título -->
+    <h1 class="text-3xl font-bold text-green-700 mb-6">
+        Motos do [[${patio.nome}]]
+    </h1>
+
+    <!-- Lista de Motos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div th:if="${patio != null and patio.motos != null and !patio.motos.empty}" th:each="moto : ${patio.motos}"
+             class="bg-white shadow-lg rounded-xl p-4 hover:scale-105 transition transform cursor-pointer">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xl font-semibold text-gray-800" th:text="${moto.placa}">ABC-1234</h2>
+                
+                <!-- Botão Localizar/Desativar -->
+                <button 
+                    th:id="'btn-' + ${moto.id}"
+                    th:onclick="'toggleDispositivo(' + ${moto.id} + ', ' + ${moto.dispositivo?.ativo ?: false} + ')'" 
+                    th:disabled="${moto.dispositivo == null}"
+                    th:classappend="${moto.dispositivo?.ativo} ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'"
+                    class="p-2 px-3 text-white rounded-xl transition disabled:bg-gray-300 disabled:cursor-not-allowed">
+                    <span th:text="${moto.dispositivo?.ativo} ? 'Desativar' : 'Localizar'">Localizar</span>
+                </button>
+            </div>
+
+            <!-- Descrição -->
+            <p class="text-gray-600 mb-1">
+                <span class="font-semibold">Descrição:</span>
+                <span th:text="${moto.descricao}">Modelo Honda CG</span>
+            </p>
+
+            <!-- Status -->
+            <p class="text-gray-600 mb-1">
+                <span class="font-semibold">Status:</span>
+                <span th:text="${moto.status}">DISPONÍVEL</span>
+            </p>
+
+            <!-- Data de Adição -->
+            <p class="text-gray-600 mb-1">
+                <span class="font-semibold">Data de Adição:</span>
+                <span th:text="${#temporals.format(moto.dataAdicao, 'dd/MM/yyyy HH:mm')}"></span>
+            </p>
+
+            <!-- Dispositivo com status visual -->
+            <p class="text-gray-600">
+                <span class="font-semibold">Dispositivo:</span>
+                <span th:if="${moto.dispositivo != null}">
+                    <span th:text="${#strings.substring(moto.dispositivo.id.toString(), 0, 8)}"></span>
+                    <span th:if="${moto.dispositivo.ativo}" class="ml-2 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">● ATIVO</span>
+                    <span th:unless="${moto.dispositivo.ativo}" class="ml-2 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">○ Inativo</span>
+                </span>
+                <span th:unless="${moto.dispositivo != null}">—</span>
+            </p>
+
+            <!-- Botões condicionais para ADMIN apenas -->
+            <div sec:authorize="hasRole('ADMIN')" class="flex gap-2 mt-3">
+                <a th:href="@{/motos/edit/{id}(id=${moto.id})}" class="btn flex-1 btn-warning">Editar</a>
+                <a th:href="@{/motos/delete/{id}(id=${moto.id})}" class="btn flex-1 btn-danger"
+                   onclick="return confirm('Tem certeza que deseja excluir esta moto?')">Excluir</a>
+            </div>
+        </div>
+
+        <div id="patio-vazio" th:if="${patio == null or patio.motos == null or patio.motos.empty}">Nenhum veículo encontrado nesse pátio</div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleDispositivo(motoId, isAtivo) {
+        const button = document.getElementById('btn-' + motoId);
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '⏳ Processando...';
+
+        const endpoint = isAtivo ? `/api/mqtt/desativar/${motoId}` : `/api/mqtt/localizar/${motoId}`;
+
+        fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.sucesso) {
+                // Atualiza o botão
+                if (isAtivo) {
+                    button.innerHTML = 'Localizar';
+                    button.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    button.classList.add('bg-green-500', 'hover:bg-green-600');
+                    alert(`✅ Dispositivo desativado!\nPlaca: ${data.placa}`);
+                } else {
+                    button.innerHTML = '🔇 Desativar';
+                    button.classList.remove('bg-green-500', 'hover:bg-green-600');
+                    button.classList.add('bg-red-500', 'hover:bg-red-600');
+                    alert(`✅ Comando enviado!\nPlaca: ${data.placa}\n\nO dispositivo está apitando agora.`);
+                }
+                
+                // Atualiza o atributo onclick
+                button.setAttribute('onclick', `toggleDispositivo(${motoId}, ${!isAtivo})`);
+                
+                // Recarrega a página após 1 segundo para atualizar o status visual
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                alert('❌ Erro: ' + (data.erro || 'Erro desconhecido'));
+                button.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            alert('❌ Erro de conexão: ' + error);
+            button.innerHTML = originalText;
+        })
+        .finally(() => {
+            button.disabled = false;
+        });
+    }
+</script>
+</body>
+</html>
