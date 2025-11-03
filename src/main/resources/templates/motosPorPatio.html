@@ -73,8 +73,8 @@
 
             <!-- Botões condicionais para ADMIN apenas -->
             <div sec:authorize="hasRole('ADMIN')" class="flex gap-2 mt-3">
-                <a th:href="@{/motos/edit/{id}(id=${moto.id})}" class="btn flex-1 btn-warning">Editar</a>
-                <a th:href="@{/motos/delete/{id}(id=${moto.id})}" class="btn flex-1 btn-danger"
+                <a th:href="@{/motos/edit/{id}(id=${moto.id})}" class="btn flex-1 btn-warning" th:id="'editar-moto-' + ${moto.id}">Editar</a>
+                <a th:href="@{/motos/delete/{id}(id=${moto.id})}" class="btn flex-1 btn-danger" th:id="'remover-moto-' + ${moto.id}"
                    onclick="return confirm('Tem certeza que deseja excluir esta moto?')">Excluir</a>
             </div>
         </div>

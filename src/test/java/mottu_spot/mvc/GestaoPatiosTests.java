@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-public class GestaoPatioTests extends BaseTest {
+public class GestaoPatiosTests extends BaseTest {
 
     @Test
 	@DisplayName("Pátio vazio")
@@ -28,16 +28,16 @@ public class GestaoPatioTests extends BaseTest {
 	@DisplayName("Pátio com motos")
     @Order(2)
 	void testPatioComMotos() {
+		// Dado que esteja logado como admin
 		realizarLoginAdmin();
 
-		// Dado que esteja num pátio com motos (ex: pátio 1)
+		// Quando estiver num pátio com motos (ex: pátio 1)
 		WebElement acessarPatioBotao = driver.findElement(By.id("patio-1"));
 		acessarPatioBotao.click();
 
-		// Quando o display for grid
+		// Então existem motos no patio
 		assert driver.findElement(By.className("grid")).isDisplayed();
 		
-		// Então existem motos no patio
 	}
 
 	@Test
@@ -74,6 +74,39 @@ public class GestaoPatioTests extends BaseTest {
 		WebElement botaoSalvar = driver.findElement(By.className("btn"));
 		botaoSalvar.click();
 
+	}
+
+	@Test
+	@DisplayName("Remover Pátio")
+	void testRemoverPatio() {
+		// Dado que esteja logado como admin
+		realizarLoginAdmin();
+
+		// Quando clicar no botão "remover pátio" em um pátio existente
+		WebElement botaoRemoverPatio = driver.findElement(By.id("remover-patio-2"));
+		botaoRemoverPatio.click();
+
+		// Então confirmar a remoção
+		driver.switchTo().alert().accept();
+	}
+
+	@Test
+	@DisplayName("Editar Pátio")
+	void testEditarPatio() {
+		// Dado que esteja logado como admin
+		realizarLoginAdmin();
+
+		// Quando clicar no botão "editar pátio" em um pátio existente
+		WebElement botaoEditarPatio = driver.findElement(By.id("editar-patio-1"));
+		botaoEditarPatio.click();
+
+		// Então preencher os campos e enviar
+		WebElement campoNome = driver.findElement(By.id("nome"));
+		campoNome.clear();
+		campoNome.sendKeys("Pátio Editado");
+
+		WebElement botaoSalvar = driver.findElement(By.cssSelector("button[type='submit']"));
+		botaoSalvar.click();
 	}
 
 }

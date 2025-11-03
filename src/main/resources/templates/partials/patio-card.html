@@ -23,11 +23,13 @@
       <a
         th:href="@{/patios/edit/{id}(id=${patio.id})}"
         class="btn btn-sm btn-warning"
+        th:id="'editar-patio-' + *{id}"
         >Editar</a
       >
       <a
         th:href="@{/patios/delete/{id}(id=${patio.id})}"
         class="btn btn-sm btn-danger"
+        th:id="'remover-patio-' + *{id}"
         onclick="return confirm('Tem certeza que deseja excluir este pátio?')"
         >Excluir</a
       >
