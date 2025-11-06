@@ -1,6 +1,7 @@
 package mottu_spot.mvc;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 
@@ -8,6 +9,7 @@ public class GestaoMotosTests extends BaseTest {
 	
     @Test
 	@DisplayName("Adicionar Moto")
+	@Order(1)
 	void testAdicionarNovaMoto() {
 		// Dado que esteja logado como admin
 		realizarLoginAdmin();
@@ -26,6 +28,7 @@ public class GestaoMotosTests extends BaseTest {
 
 	@Test
 	@DisplayName("Editar Moto")
+	@Order(2)
 	void testEditarMoto() {
 		// Dado que esteja logado como admin
 		realizarLoginAdmin();
@@ -34,7 +37,7 @@ public class GestaoMotosTests extends BaseTest {
 		driver.findElement(By.id("patio-1")).click();
 
 		// Então clique no botão editar na moto desejada, altere os campos e salve
-		driver.findElement(By.className("editar-moto-1")).click();
+		driver.findElement(By.id("editar-moto-1")).click();
 
 		driver.findElement(By.id("descricao")).clear();
 		driver.findElement(By.id("descricao")).sendKeys("Descrição atualizada.");
@@ -44,6 +47,7 @@ public class GestaoMotosTests extends BaseTest {
 
 	@Test
 	@DisplayName("Remover Moto")
+	@Order(3)
 	void testRemoverMoto() {
 		// Dado que esteja logado como admin
 		realizarLoginAdmin();
@@ -52,7 +56,7 @@ public class GestaoMotosTests extends BaseTest {
 		driver.findElement(By.id("patio-1")).click();
 
 		// Então clique no botão remover na moto desejada
-		driver.findElement(By.className("remover-moto-2")).click();
+		driver.findElement(By.id("remover-moto-2")).click();
 	}
 
 	

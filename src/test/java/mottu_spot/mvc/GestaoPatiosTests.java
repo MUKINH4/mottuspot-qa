@@ -8,38 +8,6 @@ import org.openqa.selenium.WebElement;
 
 public class GestaoPatiosTests extends BaseTest {
 
-    @Test
-	@DisplayName("Pátio vazio")
-    @Order(3)
-	void testPatioVazio() {
-
-        // Dado que esteja logado
-		realizarLoginAdmin();
-
-		// Quando consultar pátio vazio (ex: pátio 2)
-		WebElement acessarPatioBotao = driver.findElement(By.id("patio-2"));
-		acessarPatioBotao.click();
-
-		// Então o texto "Nenhum veículo encontrado nesse pátio" estará a mostra
-		assert driver.findElement(By.id("patio-vazio")).isDisplayed();
-	}
-
-	@Test
-	@DisplayName("Pátio com motos")
-    @Order(2)
-	void testPatioComMotos() {
-		// Dado que esteja logado como admin
-		realizarLoginAdmin();
-
-		// Quando estiver num pátio com motos (ex: pátio 1)
-		WebElement acessarPatioBotao = driver.findElement(By.id("patio-1"));
-		acessarPatioBotao.click();
-
-		// Então existem motos no patio
-		assert driver.findElement(By.className("grid")).isDisplayed();
-		
-	}
-
 	@Test
 	@DisplayName("Adicionar Pátio")
     @Order(1)
@@ -76,22 +44,42 @@ public class GestaoPatiosTests extends BaseTest {
 
 	}
 
+
+    @Test
+	@DisplayName("Pátio vazio")
+    @Order(2)
+	void testPatioVazio() {
+
+        // Dado que esteja logado
+		realizarLoginAdmin();
+
+		// Quando consultar pátio vazio (ex: pátio 2)
+		WebElement acessarPatioBotao = driver.findElement(By.id("patio-3"));
+		acessarPatioBotao.click();
+
+		// Então o texto "Nenhum veículo encontrado nesse pátio" estará a mostra
+		assert driver.findElement(By.id("patio-vazio")).isDisplayed();
+	}
+
 	@Test
-	@DisplayName("Remover Pátio")
-	void testRemoverPatio() {
+	@DisplayName("Pátio com motos")
+    @Order(3)
+	void testPatioComMotos() {
 		// Dado que esteja logado como admin
 		realizarLoginAdmin();
 
-		// Quando clicar no botão "remover pátio" em um pátio existente
-		WebElement botaoRemoverPatio = driver.findElement(By.id("remover-patio-2"));
-		botaoRemoverPatio.click();
+		// Quando estiver num pátio com motos (ex: pátio 1)
+		WebElement acessarPatioBotao = driver.findElement(By.id("patio-1"));
+		acessarPatioBotao.click();
 
-		// Então confirmar a remoção
-		driver.switchTo().alert().accept();
+		// Então existem motos no patio
+		assert driver.findElement(By.className("grid")).isDisplayed();
+		
 	}
 
 	@Test
 	@DisplayName("Editar Pátio")
+	@Order(4)
 	void testEditarPatio() {
 		// Dado que esteja logado como admin
 		realizarLoginAdmin();
@@ -109,4 +97,21 @@ public class GestaoPatiosTests extends BaseTest {
 		botaoSalvar.click();
 	}
 
+	
+	@Test
+	@DisplayName("Remover Pátio")
+	@Order(5)
+	void testRemoverPatio() {
+		// Dado que esteja logado como admin
+		realizarLoginAdmin();
+
+		// Quando clicar no botão "remover pátio" em um pátio existente
+		WebElement botaoRemoverPatio = driver.findElement(By.id("remover-patio-2"));
+		botaoRemoverPatio.click();
+
+		// Então confirmar a remoção
+		driver.switchTo().alert().accept();
+	}
+
+	
 }
